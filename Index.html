@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedRide – Two Wheeler Repair</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #e10600;
+            --dark: #111;
+            --light: #ffffff;
+            --gray: #f8f9fa;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            transition: background 0.3s ease;
+        }
+
+        .wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 1100px;
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        @media (min-width: 992px) {
+            .card {
+                grid-template-columns: 400px 1fr;
+                min-height: 700px;
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--red), #ff3b3b);
+            color: #fff;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .header p { font-size: 16px; opacity: 0.9; }
+
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        select#lang {
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        @media (min-width: 992px) { .content { max-height: 800px; } }
+
+        .status-badge {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 12px;
+            background: var(--gray);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 25px 0 15px;
+            color: var(--red);
+            border-bottom: 2px solid var(--gray);
+            padding-bottom: 5px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .service-item {
+            background: var(--gray);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .service-item:hover {
+            background: var(--red);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .btn-group {
+            display: flex; flex-direction: column; gap: 12px; margin: 25px 0;
+        }
+
+        .btn {
+            text-decoration: none; padding: 16px; border-radius: 14px; text-align: center;
+            font-weight: 700; display: flex; align-items: center; justify-content: center;
+            gap: 10px; transition: 0.3s;
+        }
+
+        .btn-primary { background: var(--red); color: white; }
+        .btn-secondary { border: 2px solid var(--red); color: var(--red); }
+        .btn-dark { background: var(--dark); color: white; margin-top: 10px;}
+
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white; border: 1px solid #eee; padding: 15px; border-radius: 15px; text-align: center;
+        }
+
+        .stat-card h3 { color: var(--red); font-size: 20px; }
+        .stat-card p { font-size: 11px; color: #666; }
+
+ /*------------------------------------*/
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Mobile ke liye square frame best hai portrait aur landscape mix ke liye */
+    overflow: hidden;
+    border-radius: 20px;
+    margin-top: 15px;
+    background: #000;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+@media (min-width: 768px) {
+    .slider-container { aspect-ratio: 16 / 9; } /* Laptop par wide ho jayega */
+}
+
+.slider-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.slide {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Background Blur Effect for Portrait Photos */
+.blur-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(15px) brightness(0.5);
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+/* Original Photo on top */
+.slide img {
+    position: relative;
+    z-index: 2;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Isse portrait photo kategi nahi beech mein dikhegi */
+    display: block;
+}
+
+.slider-btn {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    background: rgba(225, 6, 0, 0.8);
+    color: white; border: none;
+    width: 40px; height: 40px;
+    cursor: pointer; border-radius: 50%;
+    z-index: 10; display: flex; align-items: center; justify-content: center;
+}
+.prev { left: 10px; }
+.next { right: 10px; }
+
+.dots-container {
+    position: absolute; bottom: 15px; width: 100%; text-align: center; z-index: 11;
+}
+.dot {
+    height: 8px; width: 8px; margin: 0 5px;
+    background-color: rgba(255,255,255,0.5);
+    border-radius: 50%; display: inline-block; transition: 0.3s; cursor: pointer;
+}
+.dot.active { background-color: #fff; width: 20px; border-radius: 10px; }
+
+/*----------------------------------------------------------------*/
+
+        /* NEW SECTION STYLES */
+        .price-list { list-style: none; }
+        .price-item {
+            display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; font-size: 14px;
+        }
+        .review-card {
+            background: var(--gray); padding: 15px; border-radius: 15px; margin-bottom: 10px; font-size: 13px;
+        }
+        .review-stars { color: #f1c40f; margin-bottom: 5px; }
+        .brand-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .brand-tag { background: #eee; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .map-container { width: 100%; height: 200px; background: #eee; border-radius: 15px; overflow: hidden; }
+
+        .footer {
+            background: var(--dark); color: white; padding: 15px; text-align: center; font-size: 12px;
+        }
+
+        .floating-call {
+            position: fixed; bottom: 25px; right: 25px; background: var(--red); color: white;
+            width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(225, 6, 0, 0.3);
+            cursor: pointer; z-index: 100; animation: bounce 2s infinite;
+        }
+.tip-container-new {
+    background: #fff9e6; /* Light Warm Yellow */
+    border-left: 5px solid #f1c40f; /* Gold/Amber Border */
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(241, 196, 15, 0.1);
+}
+
+.tip-icon {
+    font-size: 24px;
+    background: #f1c40f;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    color: #fff;
+}
+
+.tip-text h4 {
+    color: #96691c;
+    font-size: 14px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tip-text p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #5d4a26;
+    font-weight: 500;
+}
+
+/* Dark Mode Support */
+body.dark-mode .tip-container-new {
+    background: #2d281a;
+    border-color: #f1c40f;
+}
+body.dark-mode .tip-text p {
+    color: #e6dbb9;
+}
+/* --- Naye Sections ka Design --- */
+.mechanic-card { background: var(--gray); padding: 20px; border-radius: 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+.mech-img { width: 70px; height: 70px; background: #ddd; border-radius: 50%; border: 3px solid var(--red); object-fit: cover; }
+.badge-gold { display: inline-block; background: #fff9e6; color: #96691c; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid #f1c40f; margin-bottom: 5px; }
+
+.step { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; background: #fff; padding: 15px; border-radius: 18px; border: 1px solid #eee; }
+.step-num { background: var(--red); color: white; width: 30px; height: 30px; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 800; }
+
+.insta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+.insta-box { aspect-ratio: 1; background: #eee; border-radius: 12px; }
+
+.c-form input, .c-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-family: inherit; }
+.tip-box { background: #fff9e6; border-left: 5px solid #f1c40f; padding: 15px; border-radius: 15px; margin: 20px 0; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+/* Naya Stylish Service Buttons */
+.service-pill-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.service-btn-luxury {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #ffffff, #f1f1f1);
+    padding: 18px 25px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 700;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    transition: 0.3s all ease;
+    cursor: pointer;
+}
+
+.service-btn-luxury:hover {
+    transform: scale(1.02);
+    border-color: var(--red);
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(225, 6, 0, 0.1);
+}
+
+.service-icon-circle {
+    width: 45px;
+    height: 45px;
+    background: var(--red);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.arrow-icon {
+    color: #ccc;
+    font-size: 18px;
+}
+
+/* Dark Mode support for new buttons */
+body.dark-mode .service-btn-luxury {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #fff;
+}
+/* Brands Styling */
+.brand-list { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.brand-tag { 
+    background: #eee; 
+    padding: 8px 15px; 
+    border-radius: 20px; 
+    font-size: 12px; 
+    font-weight: 700;
+    color: var(--dark);
+    border: 1px solid #ddd;
+}
+
+/* Instagram Grid */
+.insta-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 8px; 
+}
+
+.insta-box { 
+    aspect-ratio: 1; 
+    background: #ddd; 
+    border-radius: 12px; 
+    border: 1px solid #eee;
+}
+/* Certification Styling */
+.cert-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.cert-card {
+    background: white;
+    padding: 10px;
+    border-radius: 15px;
+    border: 1px solid #eee;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.cert-img-wrapper {
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f0f0f0;
+}
+
+.cert-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cert-photo:hover {
+    transform: scale(1.05);
+}
+
+.cert-name {
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 8px;
+    color: var(--dark);
+    text-transform: uppercase;
+}
+
+/* Modal for Zoom */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    align-items: center; justify-content: center;
+}
+#modalImg { max-width: 90%; max-height: 80%; border-radius: 10px; }
+
+/* Dark Mode Support */
+body.dark-mode .cert-card { background: #2d2d2d; border-color: #444; }
+body.dark-mode .cert-name { color: #fff; }
+
+/* Dark Mode Support for new tags */
+body.dark-mode .brand-tag { background: #333; color: #fff; border-color: #444; }
+body.dark-mode .review-card { background: #2d281a; color: #fff; }
+
+/* Logooo */
+
+.logo-container {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-logo {
+    max-width: 180px; /* Aap apne logo ke hisab se size kam ya zyada kar sakte hain */
+    height: auto;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1)); /* Logo par thoda shadow effect */
+}
+
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="lang-switch">
+        <select id="lang">
+            <option value="en">EN</option>
+            <option value="hi">हिंदी</option>
+            <option value="gu">ગુજરાતી</option>
+        </select>
+    </div>
+
+    <div class="logo-container">
+        <img src="Logo.png" alt="Zapata Services Logo" class="main-logo">
+    </div>
+
+    <h1 id="main-title" data-en="Zapata Services" data-hi="जपाटा सर्विसीज" data-gu="રેડરાઇડ રિપેર">Zapata Services</h1>
+    <p id="sub-title" data-en="Two-Wheeler Experts" data-hi="टु-व्हीलर रिपेयर एक्सपर्ट" data-gu="ટુ-વ્હીલર રિપેર નિષ્ણાત">Two-Wheeler Experts</p>
+
+</div>
+        <div class="content">
+            <div id="status" class="status-badge">Checking Status...</div>
+
+            <h2 class="section-title" data-en="Our Services" data-hi="हमारी सेवाएँ" data-gu="અમારી સેવાઓ">Our Services</h2>
+            <div class="services-grid">
+                <div class="service-item" data-en="Engine Repair" data-hi="इंजन रिपेयर" data-gu="એન્જિન રિપેર">Engine Repair</div>
+                <div class="service-item" data-en="General Service" data-hi="सामान्य सर्विस" data-gu="સામાન્ય સર્વિસ">General Service</div>
+                <div class="service-item" data-en="General Denting-Painting" data-hi="डेनटींग-पेंटिंग" data-gu="ડેન્ટિગ-પેંટિંગ">Denting-Painting</div>
+                <div class="service-item" data-en="Average Specialist" data-hi="ऐवेरेज़ स्पेश्यालिस्ट " data-gu="એવરેજ સ્પેશ્યાલિસ્ટ ">Average Specialist</div>
+            </div>
+
+            <h2 class="section-title" data-en="Price Estimates" data-hi="अनुमानित मूल्य" data-gu="અંદાજિત કિંમત">Price Estimates</h2>
+            <ul class="price-list">
+                <li class="price-item"><span data-en="Standard Service" data-hi="स्टैंडर्ड सर्विस" data-gu="સ્ટાન્ડર્ડ સર્વિસ">Standard Service</span> <span>₹350+</span></li>
+                <li class="price-item"><span data-en="Oil Change (Labor)" data-hi="ऑयल चेंज (मजदूरी)" data-gu="ઓઇલ ચેન્જ (મજૂરી)">Oil Change (Labor)</span> <span>₹50+</span></li>
+                <li class="price-item"><span data-en="Average" data-hi="ऐवेरेज़" data-gu="બ્રેક ટાઇટનિંગ">Average</span> <span>₹249+</span></li>
+            </ul>
+
+            <div class="btn-group">
+                <a href="tel:+919727708740" class="btn btn-primary">📞 <span data-en="Call Now" data-hi="अभी कॉल करें" data-gu="અત્યારે કોલ કરો">Call Now</span></a>
+                <a id="wa-btn" href="https://wa.me/919727708740" target="_blank" class="btn btn-secondary">💬 WhatsApp</a>
+                <a href="#" class="btn btn-dark">📍 <span data-en="Get Directions" data-hi="रास्ता देखें" data-gu="રસ્તો જુઓ">Get Directions</span></a>
+            </div>
+
+            <h2 class="section-title" data-en="Specialized In" data-hi="विशेषज्ञता" data-gu="વિશેષતા">Specialized In</h2>
+            <div class="brand-list">
+                <span class="brand-tag">Royal Enfield</span><span class="brand-tag">Honda</span><span class="brand-tag">Hero</span><span class="brand-tag">TVS</span><span class="brand-tag">Suzuki</span><span class="brand-tag">Jawa</span>
+            </div>
+<h2 class="section-title" data-en="Why Choose Us" data-hi="हमें क्यों चुनें" data-gu="અમને કેમ પસંદ કરો">Why Choose Us</h2>
+<div class="services-grid">
+    <div class="service-item">🛠️ <br> <span data-en="Expert Mechanic" data-hi="विशेषज्ञ मैकेनिक" data-gu="નિષ્ણાત મિકેનિક્સ">Expert Mechanic</span></div>
+    <div class="service-item">💎 <br> <span data-en="Genuine Parts" data-hi="असली पार्ट्स" data-gu="અસલી પાર્ટ્સ">Genuine Parts</span></div>
+    <div class="service-item">⏱️ <br> <span data-en="Quick Service" data-hi="तेज़ सर्विस" data-gu="ઝડપી સર્વિસ">Quick Service</span></div>
+    <div class="service-item">💰 <br> <span data-en="Fair Pricing" data-hi="सही कीमत" data-gu="વાજબી કિંમત">Fair Pricing</span></div>
+</div>
+
+<h2 class="section-title" data-en="How It Works" data-hi="यह कैसे काम करता है" data-gu="તે કેવી રીતે કામ કરે છે">How It Works</h2>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+    <div class="service-item" style="text-align: left; display: flex; gap: 15px; align-items: center;">
+        <div style="background:var(--red); color:white; width:30px; height:30px; border-radius:50%; text-align:center; line-height:30px;">1</div>
+        <span data-en="Bring your bike or Book Pickup" data-hi="बाइक लाएं या पिकअप बुक करें" data-gu="બાઇક લાવો અથવા પિકઅપ બુક કરો">Bring your bike or Book Pickup</span>
+    </div>
+    <div class="service-item" style="text-align: left; display: flex; gap: 15px; align-items: center;">
+        <div style="background:var(--red); color:white; width:30px; height:30px; border-radius:50%; text-align:center; line-height:30px;">2</div>
+        <span data-en="Free Inspection & Quote" data-hi="मुफ्त जांच और अनुमानित खर्च" data-gu="મફત તપાસ અને અંદાજિત ખર્ચ">Free Inspection & Quote</span>
+    </div>
+    <div class="service-item" style="text-align: left; display: flex; gap: 15px; align-items: center;">
+        <div style="background:var(--red); color:white; width:30px; height:30px; border-radius:50%; text-align:center; line-height:30px;">3</div>
+        <span data-en="Expert Repair & Delivery" data-hi="विशेषज्ञ मरम्मत और डिलीवरी" data-gu="નિષ્ણાત સમારકામ અને ડિલિવરી">Expert Repair & Delivery</span>
+    </div>
+</div>
+
+<h2 class="section-title" data-en="Safety Checklist" data-hi="सुरक्षा चेकलिस्ट" data-gu="સુરક્ષા ચેકલિસ્ટ">Safety Checklist</h2>
+<div style="background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 15px;">
+    <p style="font-size: 13px;">✅ <span data-en="Electrical Check" data-hi="इलेक्ट्रिकल जांच" data-gu="ઇલેક્ટ્રિકલ તપાસ">Electrical Check</span></p>
+    <p style="font-size: 13px;">✅ <span data-en="Brake Inspection" data-hi="ब्रेक की जांच" data-gu="બ્રેક તપાસ">Brake Inspection</span></p>
+    <p style="font-size: 13px;">✅ <span data-en="Engine Oil" data-hi="इंजन ऑयल " data-gu="એન્જિન ઓઇલ">Engine Oil</span></p>
+    <p style="font-size: 13px;">✅ <span data-en="Air filter" data-hi="ऐर फ़िल्टर" data-gu="એર ફિલ્ટર ચેક">Air filter</span></p>
+</div>
+
+<h2 class="section-title" data-en="Emergency Support" data-hi="आपातकालीन सहायता" data-gu="ઇમરજન્સી સપોર્ટ">Emergency Support</h2>
+<a href="tel:+919727708740" class="btn btn-dark" style="background: #e74c3c; color: white;">
+    🚨 <span data-en="Roadside Breakdown?" data-hi="रास्ते में खराब हुई?" data-gu="રસ્તામાં બગડી ગઈ?">Roadside Breakdown?</span>
+</a>
+   <h2 class="section-title" data-en="Gallery" data-hi="गैलरी" data-gu="ગેલેરી">Gallery</h2>
+<div class="slider-container">
+    <div class="slider-track" id="sliderTrack">
+        <div class="slide">
+            <div class="blur-bg" style="background-image: url('1.jpg');"></div>
+            <img src="1.jpg" alt="Work">
+        </div>
+        <div class="slide">
+            <div class="blur-bg" style="background-image: url('2.jpg');"></div>
+            <img src="2.jpg" alt="Work">
+        </div>
+        <div class="slide">
+            <div class="blur-bg" style="background-image: url('3.jpg');"></div>
+            <img src="3.jpg" alt="Work">
+        </div>
+        <div class="slide">
+            <div class="blur-bg" style="background-image: url('4.jpg');"></div>
+            <img src="4.jpg" alt="Work">
+        </div>
+        <div class="slide">
+            <div class="blur-bg" style="background-image: url('5.jpg');"></div>
+            <img src="5.jpg" alt="Work">
+        </div>
+        <div class="slide">
+            <div class="blur-bg" style="background-image: url('6.jpg');"></div>
+            <img src="6.jpg" alt="Work">
+        </div>
+        <div class="slide">
+            <div class="blur-bg" style="background-image: url('7.jpg');"></div>
+            <img src="7.jpg" alt="Work">
+        </div>
+    </div>
+    <button class="slider-btn prev" onclick="moveSlider(-1)">❮</button>
+    <button class="slider-btn next" onclick="moveSlider(1)">❯</button>
+    <div class="dots-container" id="dotsContainer"></div>
+</div>
+            <div style="background: #fff4f4; padding: 20px; border-radius: 15px; margin-top: 30px; border-left: 5px solid var(--red);">
+                <h3 style="font-size: 16px; margin-bottom: 5px;" data-en="Book Home Service?" data-hi="होम सर्विस बुक करें?" data-gu="હોમ સર્વિસ બુક કરવી છે?">Book Home Service?</h3>
+                <p style="font-size: 13px; color: #555;" data-en="We pick up your bike from your home. Contact us on WhatsApp." data-hi="हम आपके घर से बाइक पिकअप करते हैं। व्हाट्सएप पर संपर्क करें।" data-gu="અમે તમારા ઘરેથી બાઇક પિકઅપ કરીએ છીએ. વોટ્સએપ પર સંપર્ક કરો."></p>
+            </div>
+
+            <h2 class="section-title" data-en="Customer Reviews" data-hi="ग्राहकों की राय" data-gu="ગ્રાહકોના અભિપ્રાય">Customer Reviews</h2>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p>"Best service for my Activa. Very honest people." - <b>Jay Kumar</b></p>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p>"Fair prices and quick engine repair." - <b>Kamal</b></p>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card"><h3>35+</h3><p data-en="Years" data-hi="वर्ष" data-gu="વર્ષો">Years</p></div>
+                <div class="stat-card"><h3>5K+</h3><p data-en="Happy Customer" data-hi="खुश ग्राहक" data-gu="ખુશ ગ્રાહકો">Happy Clients</p></div>
+                <div class="stat-card"><h3>4.9★</h3><p data-en="Rating" data-hi="रेटिंग" data-gu="રેટિંગ">Rating</p></div>
+            </div>
+
+            <h2 class="section-title" data-en="Find Us" data-hi="हमें यहाँ पायें" data-gu="અમને અહીં શોધો">Find Us</h2>
+            <div class="map-container">
+               <iframe src="https://www.google.com/maps/embed?pb=!4v1766566335898!6m8!1m7!1sIqMb3CacpYjOU-PJ24SiyQ!2m2!1d21.62972755224637!2d69.63359161176852!3f112.4811725378002!4f-22.082625607508604!5f0.7820865974627469" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+<h2 class="section-title" data-en="Meet Our Expert" data-hi="हमारे विशेषज्ञ" data-gu="અમારા નિષ્ણાત">Meet Our Expert</h2>
+<div class="mechanic-card">
+    <div class="mech-img" style="background: url('Photo.png') center/cover;"></div>
+    <div>
+        <div class="badge-gold">🏆 Top Rated Mechanic of Last Year</div>
+        <h4 data-en="Mahendra Thanki (39+ Year Expert)" data-hi="महेंद्र थानकी (39+ Year Expert)" data-gu="મહેન્દ્ર થાનકી (39+ Year Expert)">Mahendra Thanki (39+ Year Expert)</h4>
+        <p style="font-size: 12px; opacity: 0.8;" data-en="12+ Years Exp | Specialist in Honda, KTM, Bullet" data-hi="12+ साल का अनुभव | होंडा, केटीएम, बुलेट विशेषज्ञ" data-gu="12+ વર્ષનો અનુભવ | હોન્ડા, કેટીએમ, બુલેટ નિષ્ણાત"></p>
+    </div>
+</div>
+
+<h2 class="section-title" data-en="Our Certifications" data-hi="हमारे प्रमाणपत्र" data-gu="અમારા પ્રમાણપત્રો">Our Certifications</h2>
+<div class="cert-container">
+    <div class="cert-card">
+        <div class="cert-img-wrapper">
+            <img src="D:\Zapata Service/Cirtificate1.jpg" alt="Certification 1" class="cert-photo" onclick="openCert(this.src)">
+        </div>
+        <p class="cert-name">Authorized Engine Master</p>
+    </div>
+    <div class="cert-card">
+        <div class="cert-img-wrapper">
+            <img src="D:\Zapata Service/Cirtificate2.jpg" alt="Certification 2" class="cert-photo" onclick="openCert(this.src)">
+        </div>
+        <p class="cert-name">Advanced Electronics Expert</p>
+    </div>
+</div>
+
+<div id="certModal" class="modal" onclick="this.style.display='none'">
+    <img id="modalImg" src="">
+</div>
+
+<h2 class="section-title" data-en="Our Process" data-hi="हमारी प्रक्रिया" data-gu="અમારી પ્રક્રિયા">Our Process</h2>
+<div class="step"><div class="step-num">1</div><span data-en="Identify Problem..." data-hi="समस्या की पहचान..." data-gu="સમસ્યા ઓળખો...">Identify Problem...</span></div>
+<div class="step"><div class="step-num">2</div><span data-en="Work on Problem with Experts..." data-hi="विशेषज्ञ के साथ समस्या पर काम..." data-gu="નિષ્ણાત સાથે સમસ્યા પર કામ">Work on Problem with Experts...</span></div>
+<div class="step"><div class="step-num">3</div><span data-en="Quality Test Ride..." data-hi="क्वालिटी टेस्ट राइड..." data-gu="ક્વોલિટી ટેસ્ટ રાઈડ...">Quality Test Ride...</span></div>
+
+<h2 class="section-title" data-en="Premium Solutions" data-hi="प्रीमियम समाधान" data-gu="પ્રીમિયમ સમાધાન">Premium Solutions</h2>
+
+<div class="service-pill-container">
+    <div class="service-btn-luxury" onclick="serviceInquiry('Home Pickup')">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="service-icon-circle">🏠</div>
+            <div>
+                <span style="display:block;" data-en="VIP Home Pickup" data-hi="वीआईपी होम पिकअप" data-gu="વીઆઈપી હોમ પિકઅપ">VIP Home Pickup</span>
+                <small style="font-weight:700; font-size:12px; color:var(--red);" data-en="Chat Now!" data-hi="अभी चैट करें!" data-gu="અત્યારે ચેટ કરો!">Chat Now!</small>
+            </div>
+        </div>
+        <div class="arrow-icon">➔</div>
+    </div>
+
+    <div class="service-btn-luxury" onclick="serviceInquiry('Used Bike Check')">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="service-icon-circle">🔍</div>
+            <div>
+                <span style="display:block;" data-en="Pre-Purchase Check" data-hi="पुरानी बाइक जांच" data-gu="જૂની બાઇક તપાસ">Pre-Purchase Check</span>
+                <small style="font-weight:700; font-size:12px; color:var(--red);" data-en="Chat Now!" data-hi="अभी चैट करें!" data-gu="અત્યારે ચેટ કરો!">Chat Now!</small>
+            </div>
+        </div>
+        <div class="arrow-icon">➔</div>
+    </div>
+
+    <div class="service-btn-luxury" onclick="serviceInquiry('Custom Mods')">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="service-icon-circle">⚡</div>
+            <div>
+                <span style="display:block;" data-en="Custom Modification" data-hi="कस्टम मोडिफिकेशन" data-gu="કસ્ટમ મોડિફિકેશન">Custom Modification</span>
+                <small style="font-weight:700; font-size:12px; color:var(--red);" data-en="Chat Now!" data-hi="अभी चैट करें!" data-gu="અત્યારે ચેટ કરો!">Chat Now!</small>
+            </div>
+        </div>
+        <div class="arrow-icon">➔</div>
+    </div>
+</div>
+<div class="service-pill-container">
+    <div class="service-btn-luxury" onclick="serviceInquiry('Home Pickup')">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="service-icon-circle">🏠</div>
+            <div>
+                <span style="display:block;" data-en="VIP Home Pickup" data-hi="वीआईपी होम पिकअप" data-gu="વીઆઈપી હોમ પિકઅપ">VIP Home Pickup</span>
+                <small style="font-weight:400; font-size:11px; color:#777;">Within 3-5 KM range Book </small>
+                
+            </div>
+        </div>
+        <div class="arrow-icon">➔</div>
+    </div>
+
+<h2 class="section-title" data-en="Brands We Repair" data-hi="ब्रांड्स जिनका हम काम करते हैं" data-gu="બ્રાન્ડ્સ જેનું અમે કામ કરીએ છીએ">Brands We Repair</h2>
+<div class="brand-list">
+    <span class="brand-tag">Royal Enfield</span>
+    <span class="brand-tag">Honda</span>
+    <span class="brand-tag">Hero</span>
+    <span class="brand-tag">TVS</span>
+    <span class="brand-tag">Suzuki</span>
+    <span class="brand-tag">Bajaj</span>
+    <span class="brand-tag">Yamaha</span>
+     <span class="brand-tag">Jawa</span>
+    <span class="brand-tag">KTM</span>
+</div>
+
+<h2 class="section-title" data-en="Our Advanced Tools" data-hi="हमारे आधुनिक टूल्स" data-gu="અમારા આધુનિક સાધનો">Our Advanced Tools</h2>
+<div class="services-grid">
+    <div class="service-item">💻 <br> <span data-en="OBD Scanner" data-hi="OBD स्कैनर" data-gu="OBD સ્કેનર">OBD Scanner</span></div>
+    <div class="service-item">🎨 <br> <span data-en="Denting-Painting" data-hi="डेनटींग-पेंटिंग" data-gu="ડેન્ટિગ-પેંટિંગ">Denting-Painting</span></div>
+    <div class="service-item">🛠️ <br> <span data-en="Precision Tools" data-hi="सटीक औजार" data-gu="ચોકસાઇ સાધનો">Precision Tools</span></div>
+</div>
+
+<h2 class="section-title" data-en="Recent Work & Reviews" data-hi="हालिया काम और समीक्षाएं" data-gu="તાજેતરના કામ અને સમીક્ષાઓ">Recent Work & Reviews</h2>
+<div class="review-card" style="border: 1px solid #f1c40f; background: #fff9e6;">
+    <div class="review-stars">★★★★</div>
+    <p><strong>4.2/5 on Google Reviews</strong></p>
+</div>
+
+<div class="insta-grid">
+    <div class="insta-box" style="background: url('D:\Zapata Service/Album1.jpg') center/cover;"></div>
+    <div class="insta-box" style="background: url('D:\Zapata Service/Album2.jpg') center/cover;"></div>
+    <div class="insta-box" style="background: url('D:\Zapata Service/Album3.jpg') center/cover;"></div>
+</div>
+
+    <div class="service-btn-luxury" onclick="serviceInquiry('Used Bike Check')">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="service-icon-circle">🔍</div>
+            <div>
+                <span style="display:block;" data-en="Pre-Purchase Check" data-hi="पुरानी बाइक जांच" data-gu="જૂની બાઇક તપાસ">Pre-Purchase Check</span>
+                <small style="font-weight:400; font-size:11px; color:#777;">40+ Point Inspection</small>
+            </div>
+        </div>
+        <div class="arrow-icon">➔</div>
+    </div>
+
+    <div class="service-btn-luxury" onclick="serviceInquiry('Custom Mods')">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="service-icon-circle">⚡</div>
+            <div>
+                <span style="display:block;" data-en="Custom Modification" data-hi="कस्टम मोडिफिकेशन" data-gu="કસ્ટમ મોડિફિકેશન">Custom Modification</span>
+                <small style="font-weight:400; font-size:11px; color:#777;">Vinyl Wraps & Lights</small>
+            </div>
+        </div>
+        <div class="arrow-icon">➔</div>
+    </div>
+</div>
+
+<div class="stat-card" style="margin-top:20px; text-align:center; border:1px solid #f1c40f; background:#fff9e6;">
+    <div style="color:#f1c40f; font-size:20px;">★★★★★</div>
+    <p style="font-weight:700; font-size:14px;">4.9/5 on Google Reviews</p>
+    <a href="https://www.google.com/search?q=zapata+services&rlz=1C1VDKB_enIN1101IN1101&oq=zapata+services&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgcIARAuGIAEMggIAhAAGBYYHjIICAMQABgWGB4yCAgEEAAYFhgeMggIBRAAGBYYHjIICAYQABgWGB4yCAgHEAAYFhgeMggICBAAGBYYHtIBCDcxODdqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8&zx=1766568524152&no_sw_cr=1#lrd=0x395635455ed2a489:0x7679835d55e719d6,1,,,," target="_blank" style="color:var(--red); font-size:12px; text-decoration:none;">Click to see all reviews →</a>
+</div>
+
+<div style="display: flex; justify-content: space-around; background:#e10600; padding: 20px; border-radius: 20px; margin: 25px 0; color: white; text-align: center;">
+    <div>
+        <h3 style="color:#fffefe; font-size:24px;">1200+</h3>
+        <p style="font-size:10px; text-transform:uppercase;">Bikes Repaired</p>
+    </div>
+    <div style="border-left: 1px solid #f0cfcf; padding-left: 20px;">
+        <h3 style="color:#fffefe; font-size:24px;">98%</h3>
+        <p style="font-size:10px; text-transform:uppercase;">Happy Clients</p>
+    </div>
+    <div style="border-left: 1px solid #f0cfcf; padding-left: 20px;">
+        <h3 style="color:#fffefe; font-size:24px;">12+</h3>
+        <p style="font-size:10px; text-transform:uppercase;">Years Exp.</p>
+    </div>
+</div>
+
+<h2 class="section-title" data-en="Send Inquiry" data-hi="पूछताछ भेजें" data-gu="પૂછપરછ મોકલો">Send Inquiry</h2>
+<form class="c-form">
+    <input type="text" placeholder="Your Name / आपका नाम">
+    <textarea rows="3" placeholder="Bike Issue / समस्या बताएं"></textarea>
+    <button type="button" class="btn btn-primary" style="width:100%; border:none; cursor:pointer;">Submit</button>
+</form>
+            <button id="themeToggle" class="btn btn-dark" style="width: 100%; border: none; cursor: pointer; margin-top: 30px;">🌓 Switch Theme</button>
+        </div>
+
+        <div class="footer">
+            © 2024 RedRide Repair • Professional Two-Wheeler Care
+        </div>
+    </div>
+</div>
+
+<div class="floating-call" onclick="window.location.href='tel:+919727708740'">📞</div>
+
+<script>
+    // 1. GLOBAL VARIABLES
+    let isDark = false;
+    const MY_PHONE = "919727708740"; // <-- Yahan apna asli WhatsApp number daalna
+    const MY_ADDRESS = "RedRide Repair Shop, Your Area, Your City"; // <-- Apna shop address yahan likhein
+
+    // 2. WHATSAPP & TIMING LOGIC (Automatic Message update ke saath)
+    function checkStatus() {
+        const now = new Date();
+        const day = now.getDay(); // 0 = Sun, 1-6 = Mon-Sat
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const currentTime = hours + (minutes / 60);
+
+        const statusEl = document.getElementById('status');
+        const waBtn = document.querySelector('.btn-secondary'); 
+        
+        let isOpen = false;
+
+        // Aapki Shop ki timing: 
+        // Somwar se Shanivar: 09:00 AM - 01:30 PM aur 04:00 PM - 07:00 PM
+        // Ravivar: 09:00 AM - 01:30 PM (Shaam ko band)
+        const mStart = 9.0, mEnd = 13.5;
+        const eStart = 16.0, eEnd = 19.0;
+
+        if (day >= 1 && day <= 6) { // Mon-Sat
+            if ((currentTime >= mStart && currentTime < mEnd) || (currentTime >= eStart && currentTime < eEnd)) {
+                isOpen = true;
+            }
+        } else if (day === 0) { // Sunday
+            if (currentTime >= mStart && currentTime < mEnd) {
+                isOpen = true;
+            }
+        }
+
+        // UI & WhatsApp Link Update
+        if (statusEl && waBtn) {
+            if (isOpen) {
+                statusEl.innerHTML = '🟢 OPEN NOW';
+                statusEl.style.color = '#2ecc71';
+                statusEl.style.background = '#e8f8f0'; // Light green background
+                waBtn.href = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent("Hi RedRide, I want to book a service for my bike right now.")}`;
+            } else {
+                statusEl.innerHTML = '🔴 CLOSED NOW';
+                statusEl.style.color = '#e74c3c';
+                statusEl.style.background = '#fff0f0'; // Light red background
+                waBtn.href = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent("Hi, I saw you are closed. Can you tell me when I can come tomorrow?")}`;
+            }
+        }
+    }
+
+    // 3. MAP/DIRECTIONS (Sahi Google Maps URL ke saath)
+    const mapBtn = document.getElementById('mapBtn') || document.querySelector('.btn-dark');
+    if (mapBtn) {
+        mapBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Isse direct Google Maps ka search khulega aapki shop ke naam se
+            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MY_ADDRESS)}`;
+            window.open(mapUrl, '_blank');
+        });
+    }
+
+    // 4. THEME TOGGLE (Naye sections: Mechanic Card, Steps, etc. ke liye fix)
+    const themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            isDark = !isDark;
+            
+            // Body toggle
+            document.body.classList.toggle('dark-mode', isDark);
+            document.body.style.backgroundColor = isDark ? '#121212' : '#f0f2f5';
+            
+            // Main Card update
+            const card = document.querySelector('.card');
+            if (card) {
+                card.style.backgroundColor = isDark ? '#1e1e1e' : '#fff';
+                card.style.color = isDark ? '#fff' : '#333';
+            }
+
+            // Naye aur Purane sabhi boxes ko ek saath update karega
+            const items = document.querySelectorAll('.service-item, .stat-card, .item-box, .review-card, .step, .mechanic-card, .tip-box, .c-form');
+            items.forEach(el => {
+                el.style.backgroundColor = isDark ? '#2d2d2d' : '#f8f9fa';
+                el.style.color = isDark ? '#eee' : '#333';
+                el.style.borderColor = isDark ? '#444' : '#eee';
+            });
+
+            // Button text update
+            themeBtn.innerText = isDark ? '☀️ Switch to Light' : '🌓 Switch Theme';
+        });
+    }
+
+    // 5. LANGUAGE SWITCHER (Naye sections ke translations ke liye)
+    const langSelect = document.getElementById('lang');
+    if (langSelect) {
+        langSelect.addEventListener('change', (e) => {
+            const lang = e.target.value;
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.innerText = el.getAttribute(`data-${lang}`);
+            });
+            // Update WhatsApp message on language change too
+            checkStatus();
+        });
+    }
+// Special Services Inquiry Function
+function serviceInquiry(serviceName) {
+    const phone = "919727708740"; // <-- Apna number yahan check karlein
+    let message = "";
+
+    if(serviceName === 'Home Pickup') {
+        message = "Hi RedRide, I want to book a Home Pickup for my bike service. Please let me know the process.";
+    } else if(serviceName === 'Used Bike Check') {
+        message = "Hi, I am buying a second-hand bike and want you to inspect it. What are the charges?";
+    } else if(serviceName === 'Insurance Renewal') {
+        message = "Hi, I want to renew my bike insurance. Can you help me with the quotes?";
+    }
+
+function openCert(src) {
+    document.getElementById('certModal').style.display = 'flex';
+    document.getElementById('modalImg').src = src;
+}
+
+    // WhatsApp par redirect karega
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+let currentIdx = 0;
+const track = document.getElementById('sliderTrack');
+const slides = document.querySelectorAll('.slide');
+const dotsCont = document.getElementById('dotsContainer');
+
+// Create Dots
+slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.classList.add('dot');
+    if (i === 0) dot.classList.add('active');
+    dot.onclick = () => goToSlide(i);
+    dotsCont.appendChild(dot);
+});
+
+const allDots = document.querySelectorAll('.dot');
+
+function updateSlider() {
+    track.style.transform = `translateX(-${currentIdx * 100}%)`;
+    allDots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
+}
+
+function moveSlider(dir) {
+    currentIdx = (currentIdx + dir + slides.length) % slides.length;
+    updateSlider();
+}
+
+function goToSlide(idx) {
+    currentIdx = idx;
+    updateSlider();
+}
+
+// Auto Play (Har 4 seconds mein)
+setInterval(() => moveSlider(1), 4000);
+
+    // INITIALIZE (Page khulne par pehli baar chalega)
+    checkStatus();
+    setInterval(checkStatus, 60000); // Har 1 minute mein apne aap timing check karega
+</script>
+
+</body>
+</html>
